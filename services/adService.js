@@ -80,7 +80,8 @@ const getAllAds = async (filter = {}) => {
 
   if (filter.category) query.category = filter.category;
   if (filter.subcategory) query.subcategory = filter.subcategory;
-  if (filter.location) query.location = new RegExp(filter.location, "i");
+  if (filter.city) query["location.city"] = new RegExp(filter.city, "i");
+  if (filter.region) query["location.region"] = filter.region;
   if (filter.minPrice || filter.maxPrice) {
     query.price = {};
     if (filter.minPrice) query.price.$gte = Number(filter.minPrice);
@@ -166,7 +167,7 @@ const createAd = async (data, userId) => {
 
   await validateFields(data.subcategory, data.fields);
 
-  return await Ad.create({ ...data, user: userId, status: "draft" });
+  return await Ad.create({ ...data, user: userId, status: "pending" });
 };
 
 const updateAd = async (id, data, userId) => {
