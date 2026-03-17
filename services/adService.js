@@ -80,8 +80,6 @@ const getAllAds = async (filter = {}) => {
 
   if (filter.category) query.category = filter.category;
   if (filter.subcategory) query.subcategory = filter.subcategory;
-  if (filter.city) query["location.city"] = new RegExp(filter.city, "i");
-  if (filter.region) query["location.region"] = filter.region;
   if (filter.minPrice || filter.maxPrice) {
     query.price = {};
     if (filter.minPrice) query.price.$gte = Number(filter.minPrice);
@@ -238,7 +236,6 @@ const getAllAdsAdmin = async (filter = {}) => {
   if (filter.category) query.category = filter.category;
   if (filter.subcategory) query.subcategory = filter.subcategory;
   if (filter.user) query.user = filter.user;
-  if (filter.location) query.location = new RegExp(filter.location, "i");
   if (filter.minPrice || filter.maxPrice) {
     query.price = {};
     if (filter.minPrice) query.price.$gte = Number(filter.minPrice);

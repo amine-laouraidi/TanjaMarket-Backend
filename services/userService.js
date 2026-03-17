@@ -8,8 +8,8 @@ const nodemailer = require("nodemailer");
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const generateAccessToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "15m" });
+const generateAccessToken = (id, role) => {
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "15m" });
 };
 
 const generateRefreshToken = () => {
@@ -42,9 +42,15 @@ const register = async (data, device) => {
   const existing = await User.findOne({ $or: [{ email }, { phone }] });
   if (existing) {
     if (existing.email === email)
-      throw new ErrorResponse("This email is already associated with an account", 409);
+      throw new ErrorResponse(
+        "This email is already associated with an account",
+        409,
+      );
     if (existing.phone === phone)
-      throw new ErrorResponse("This phone is already associated with an account", 409);
+      throw new ErrorResponse(
+        "This phone is already associated with an account",
+        409,
+      );
   }
 
   const user = await User.create({
@@ -55,7 +61,7 @@ const register = async (data, device) => {
     location,
   });
 
-  const accessToken = generateAccessToken(user._id);
+  const accessToken = generateAccessToken(user._id, user.role);
   const refreshToken = generateRefreshToken();
 
   await Token.create({
@@ -66,13 +72,6 @@ const register = async (data, device) => {
   });
 
   return {
-    user: {
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      phone: user.phone,
-      location: user.location,
-    },
     accessToken,
     refreshToken,
   };
@@ -85,7 +84,7 @@ const login = async ({ email, password }, device) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) throw new ErrorResponse("Invalid email or password", 401);
 
-  const accessToken = generateAccessToken(user._id);
+  const accessToken = generateAccessToken(user._id, user.role);
   const refreshToken = generateRefreshToken();
 
   await Token.create({
@@ -96,14 +95,6 @@ const login = async ({ email, password }, device) => {
   });
 
   return {
-    user: {
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      phone: user.phone,
-      location: user.location,
-      role: user.role,
-    },
     accessToken,
     refreshToken,
   };
@@ -117,7 +108,8 @@ const refresh = async (rawRefreshToken) => {
     expiresAt: { $gt: Date.now() },
   });
 
-  if (!tokenDoc) throw new ErrorResponse("Invalid or expired refresh token", 401);
+  if (!tokenDoc)
+    throw new ErrorResponse("Invalid or expired refresh token", 401);
 
   const accessToken = generateAccessToken(tokenDoc.user);
   return { accessToken };

@@ -4,66 +4,80 @@ const userSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
-      required: [true, "Full name is required"],
+      required: [true, "Le nom complet est obligatoire"],
       trim: true,
-      maxlength: [50, "Full name cannot exceed 50 characters"],
+      minlength: [3, "Le nom complet doit contenir au moins 3 caractères"],
+      maxlength: [50, "Le nom complet ne peut pas dépasser 50 caractères"],
     },
+
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: [true, "L'adresse email est obligatoire"],
       unique: true,
       lowercase: true,
+      trim: true,
       match: [
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        "Please provide a valid email",
+        "Veuillez fournir une adresse email valide",
       ],
     },
-    status: {
-      type: String,
-      enum: ["active", "banned", "suspended"],
-      default: "active",
-    },
+
     password: {
       type: String,
-      required: [true, "Password is required"],
-      minlength: [6, "Password must be at least 6 characters"],
+      required: [true, "Le mot de passe est obligatoire"],
+      minlength: [6, "Le mot de passe doit contenir au moins 6 caractères"],
       select: false,
     },
+
     phone: {
       type: String,
-      required: [true, "Phone is required"],
+      required: [true, "Le numéro de téléphone est obligatoire"],
+      trim: true,
       match: [
         /^(\+212|0)([ \-]?\d){9}$/,
-        "Please provide a valid Moroccan phone number",
+        "Veuillez fournir un numéro de téléphone marocain valide",
       ],
     },
-    location: {
-      city: { type: String, trim: true },
-      region: {
-        type: String,
-        enum: [
-          "Casablanca-Settat",
-          "Rabat-Salé-Kénitra",
-          "Marrakech-Safi",
-          "Fès-Meknès",
-          "Tanger-Tétouan-Al Hoceïma",
-          "Souss-Massa",
-          "Oriental",
-          "Béni Mellal-Khénifra",
-          "Drâa-Tafilalet",
-          "Guelmim-Oued Noun",
-        ],
-      },
+
+    avatar: {
+      type: String,
+      default: null,
     },
+
+    status: {
+      type: String,
+      enum: {
+        values: ["active", "banned", "suspended"],
+        message: '"{VALUE}" n\'est pas un statut valide',
+      },
+      default: "active",
+    },
+
     role: {
       type: String,
-      enum: ["user", "admin"],
+      enum: {
+        values: ["user", "admin"],
+        message: '"{VALUE}" n\'est pas un rôle valide',
+      },
       default: "user",
     },
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
+
+   
+    resetPasswordToken: {
+      type: String,
+      select: false,
+    },
+
+    resetPasswordExpire: {
+      type: Date,
+      select: false,
+    },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
+
+// indexes
+userSchema.index({ phone: 1 });
+userSchema.index({ status: 1 });
 
 module.exports = mongoose.model("User", userSchema);

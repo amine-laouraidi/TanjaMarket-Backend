@@ -71,25 +71,7 @@ const adSchema = new mongoose.Schema(
       city: {
         type: String,
         trim: true,
-        maxlength: [100, "La ville ne peut pas dépasser 100 caractères"],
-      },
-      region: {
-        type: String,
-        enum: {
-          values: [
-            "Casablanca-Settat",
-            "Rabat-Salé-Kénitra",
-            "Marrakech-Safi",
-            "Fès-Meknès",
-            "Tanger-Tétouan-Al Hoceïma",
-            "Souss-Massa",
-            "Oriental",
-            "Béni Mellal-Khénifra",
-            "Drâa-Tafilalet",
-            "Guelmim-Oued Noun",
-          ],
-          message: '"{VALUE}" n\'est pas une région marocaine valide',
-        },
+        default: "Tanger",
       },
     },
 
@@ -108,7 +90,7 @@ const adSchema = new mongoose.Schema(
       min: [0, "Le nombre de vues ne peut pas être négatif"],
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 adSchema.index({ category: 1 });
@@ -117,7 +99,6 @@ adSchema.index({ user: 1 });
 adSchema.index({ price: 1 });
 adSchema.index({ status: 1 });
 adSchema.index({ category: 1, status: 1 });
-adSchema.index({ "location.region": 1 });
 adSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("Ad", adSchema);

@@ -15,19 +15,19 @@ const COOKIE_OPTIONS = {
 // POST /api/auth/register
 const register = asyncHandler(async (req, res) => {
   const device = req.headers["user-agent"];
-  const { user, accessToken, refreshToken } = await userService.register(req.body, device);
+  const {  accessToken, refreshToken } = await userService.register(req.body, device);
 
   res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
-  res.status(201).json({ user, accessToken });
+  res.status(201).json({  accessToken });
 });
 
 // POST /api/auth/login
 const login = asyncHandler(async (req, res) => {
   const device = req.headers["user-agent"];
-  const { user, accessToken, refreshToken } = await userService.login(req.body, device);
+  const { accessToken, refreshToken } = await userService.login(req.body, device);
 
   res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
-  res.status(200).json({ user, accessToken });
+  res.status(200).json({ accessToken });
 });
 
 // POST /api/auth/refresh

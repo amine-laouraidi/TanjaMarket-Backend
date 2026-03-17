@@ -14,12 +14,22 @@ const {
 const { protect } = require("../middlewares/authMiddleware");
 
 const createLimiter = require("../middlewares/rateLimitMiddleware");
+const {
+  registerSchema,
+  loginSchema,
+} = require("../validations/authValidation");
+const validate = require("../middlewares/validate");
 
 // ─── Auth routes (/api/auth) ──────────────────────────────────────────────────
 const authRouter = express.Router();
 
-authRouter.post("/register", createLimiter(5), register);
-authRouter.post("/login", createLimiter(10), login);
+authRouter.post(
+  "/register",
+  createLimiter(5),
+  validate(registerSchema),
+  register,
+);
+authRouter.post("/login", createLimiter(10), validate(loginSchema), login);
 authRouter.post("/refresh", createLimiter(20), refresh);
 authRouter.post("/logout", logout);
 authRouter.post("/logout-all", protect, logoutAll);
