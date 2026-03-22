@@ -106,13 +106,30 @@ const refresh = async (rawRefreshToken) => {
   const tokenDoc = await Token.findOne({
     token: hashToken(rawRefreshToken),
     expiresAt: { $gt: Date.now() },
-  });
+  }).populate("user", "role");
 
   if (!tokenDoc)
     throw new ErrorResponse("Invalid or expired refresh token", 401);
 
-  const accessToken = generateAccessToken(tokenDoc.user);
-  return { accessToken };
+  // Delete old token
+  await Token.deleteOne({ _id: tokenDoc._id });
+
+  // Generate both new tokens
+  const accessToken = generateAccessToken(
+    tokenDoc.user._id,
+    tokenDoc.user.role,
+  );
+  const refreshToken = generateRefreshToken();
+
+  // Save new refresh token to DB
+  await Token.create({
+    user: tokenDoc.user._id,
+    token: hashToken(refreshToken),
+    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    device: tokenDoc.device,
+  });
+
+  return { accessToken, refreshToken }; // ✅ return both
 };
 
 const logout = async (rawRefreshToken) => {

@@ -56,23 +56,6 @@ exports.createAdSchema = z.object({
         .trim()
         .max(100, "Le nom de la ville est trop long")
         .optional(),
-      region: z
-        .enum(
-          [
-            "Casablanca-Settat",
-            "Rabat-Salé-Kénitra",
-            "Marrakech-Safi",
-            "Fès-Meknès",
-            "Tanger-Tétouan-Al Hoceïma",
-            "Souss-Massa",
-            "Oriental",
-            "Béni Mellal-Khénifra",
-            "Drâa-Tafilalet",
-            "Guelmim-Oued Noun",
-          ],
-          { errorMap: () => ({ message: "Veuillez sélectionner une région marocaine valide" }) }
-        )
-        .optional(),
     })
     .optional(),
 });

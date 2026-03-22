@@ -37,6 +37,7 @@ app.use("/api/categories", require("./routes/categoryRoutes"));
 app.use("/api/subcategories", require("./routes/subcategoryRoutes"));
 app.use("/api/fields", require("./routes/fieldTemplateRoutes"));
 app.use("/api/ads", require("./routes/adRoutes"));
+app.use("/api/saved", require("./routes/savedAdRoutes"));
 app.use("/api/admin", require("./routes/admin/index"));
 
 app.use(errorHandler);

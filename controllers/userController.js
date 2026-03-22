@@ -1,15 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const userService = require("../services/userService");
 
-// ─── Cookie config ────────────────────────────────────────────────────────────
-
-const COOKIE_OPTIONS = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "strict",
-  maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-};
-
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
 // POST /api/auth/register
@@ -18,37 +9,32 @@ const register = asyncHandler(async (req, res) => {
   const {  accessToken, refreshToken } = await userService.register(req.body, device);
 
   res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
-  res.status(201).json({  accessToken });
+  res.status(201).json({  accessToken ,refreshToken});
 });
 
 // POST /api/auth/login
 const login = asyncHandler(async (req, res) => {
   const device = req.headers["user-agent"];
   const { accessToken, refreshToken } = await userService.login(req.body, device);
-
-  res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
-  res.status(200).json({ accessToken });
+  res.status(200).json({ accessToken,refreshToken });
 });
 
 // POST /api/auth/refresh
 const refresh = asyncHandler(async (req, res) => {
-  const { refreshToken } = req.cookies;
-  const { accessToken } = await userService.refresh(refreshToken);
-  res.status(200).json({ accessToken });
+  const { accessToken ,refreshToken} = await userService.refresh(req.body.refreshToken);
+  res.status(200).json({ accessToken,refreshToken });
 });
 
 // POST /api/auth/logout
 const logout = asyncHandler(async (req, res) => {
-  const { refreshToken } = req.cookies;
+  const { refreshToken } = req.body;
   await userService.logout(refreshToken);
-  res.clearCookie("refreshToken");
   res.status(200).json({ message: "Logged out successfully" });
 });
 
 // POST /api/auth/logout-all
 const logoutAll = asyncHandler(async (req, res) => {
   await userService.logoutAll(req.user.id);
-  res.clearCookie("refreshToken");
   res.status(200).json({ message: "Logged out from all devices" });
 });
 

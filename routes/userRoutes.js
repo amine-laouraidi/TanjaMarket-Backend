@@ -29,7 +29,7 @@ authRouter.post(
   validate(registerSchema),
   register,
 );
-authRouter.post("/login", createLimiter(10), validate(loginSchema), login);
+authRouter.post("/login",  validate(loginSchema), login);
 authRouter.post("/refresh", createLimiter(20), refresh);
 authRouter.post("/logout", logout);
 authRouter.post("/logout-all", protect, logoutAll);
