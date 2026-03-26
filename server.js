@@ -27,18 +27,17 @@ if (process.env.NODE_ENV === "development") {
 app.use(helmet());
 app.use(ExpressMongoSanitize());
 app.use(xss());
-app.use(createLimiter(100));
 
 const { authRouter, userRouter } = require("./routes/userRoutes");
 
-app.use("/api/auth", authRouter);
-app.use("/api/users", userRouter);
-app.use("/api/categories", require("./routes/categoryRoutes"));
-app.use("/api/subcategories", require("./routes/subcategoryRoutes"));
-app.use("/api/fields", require("./routes/fieldTemplateRoutes"));
-app.use("/api/ads", require("./routes/adRoutes"));
-app.use("/api/saved", require("./routes/savedAdRoutes"));
-app.use("/api/admin", require("./routes/admin/index"));
+app.use("/api/auth", createLimiter(20), authRouter);
+app.use("/api/users", createLimiter(100), userRouter);
+app.use("/api/categories", createLimiter(500), require("./routes/categoryRoutes"));
+app.use("/api/subcategories", createLimiter(500), require("./routes/subcategoryRoutes"));
+app.use("/api/fields", createLimiter(300), require("./routes/fieldTemplateRoutes"));
+app.use("/api/ads", createLimiter(500), require("./routes/adRoutes"));
+app.use("/api/saved", createLimiter(300), require("./routes/savedAdRoutes"));
+app.use("/api/admin", createLimiter(100), require("./routes/admin/index"));
 
 app.use(errorHandler);
 app.listen(port, () => console.log("Server Started On Port " + port));

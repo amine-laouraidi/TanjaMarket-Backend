@@ -29,18 +29,24 @@ exports.createAdSchema = z.object({
     .string()
     .regex(
       /^(\+212|0)([ \-]?\d){9}$/,
-      "Veuillez entrer un numéro de téléphone marocain valide (ex: 0612345678)"
-    )
-    .optional(),
-
+      "Veuillez entrer un numéro de téléphone marocain valide (ex: 0612345678)",
+    ),
   images: z
-    .array(z.string(), { invalid_type_error: "Les images doivent être un tableau d'URLs" })
-    .max(10, "Vous pouvez télécharger 10 images maximum")
-    .optional(),
-
+    .array(
+      z.object({
+        url: z.string(),
+        public_id: z.string(),
+      }),
+      { invalid_type_error: "Les images doivent être un tableau d'objets" },
+    )
+    .min(1, "Veuillez ajouter au moins une photo")
+    .max(10, "Vous pouvez télécharger 10 images maximum"),
   category: objectId.refine(Boolean, "Veuillez sélectionner une catégorie"),
 
-  subcategory: objectId.refine(Boolean, "Veuillez sélectionner une sous-catégorie"),
+  subcategory: objectId.refine(
+    Boolean,
+    "Veuillez sélectionner une sous-catégorie",
+  ),
 
   fields: z.record(z.unknown()).optional(),
 

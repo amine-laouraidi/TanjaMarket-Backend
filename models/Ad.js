@@ -30,9 +30,13 @@ const adSchema = new mongoose.Schema(
         "Veuillez fournir un numéro de téléphone marocain valide",
       ],
     },
-
     images: {
-      type: [String],
+      type: [
+        {
+          url: { type: String, required: true },
+          public_id: { type: String, required: true },
+        },
+      ],
       validate: {
         validator: (images) => images.length <= 10,
         message: "Vous pouvez télécharger un maximum de 10 images",
@@ -100,5 +104,6 @@ adSchema.index({ price: 1 });
 adSchema.index({ status: 1 });
 adSchema.index({ category: 1, status: 1 });
 adSchema.index({ createdAt: -1 });
+adSchema.index({ title: "text", description: "text" });
 
 module.exports = mongoose.model("Ad", adSchema);

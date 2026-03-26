@@ -190,6 +190,8 @@ const getMe = async (userId) => {
 const updateMe = async (userId, data) => {
   delete data.password;
   delete data.role;
+  delete data.email;
+  delete data.status;
 
   const user = await User.findByIdAndUpdate(userId, data, {
     new: true,

@@ -79,24 +79,38 @@ const validateFields = async (subcategoryId, fields = {}) => {
 const getAllAds = async (filter = {}) => {
   const query = { status: "published" };
 
+  // ── Text search ──
+  if (filter.q?.trim()) {
+    query.$text = { $search: filter.q.trim() };
+  }
+
+  // ── Category / subcategory ──
   if (filter.category) query.category = filter.category;
   if (filter.subcategory) query.subcategory = filter.subcategory;
+
+  // ── Price range ──
   if (filter.minPrice || filter.maxPrice) {
     query.price = {};
     if (filter.minPrice) query.price.$gte = Number(filter.minPrice);
     if (filter.maxPrice) query.price.$lte = Number(filter.maxPrice);
   }
 
-  const page = Number(filter.page) || 1;
+  // ── Pagination ──
+  const page = Math.max(Number(filter.page) || 1, 1);
   const limit = Math.min(Number(filter.limit) || 20, 100);
   const skip = (page - 1) * limit;
 
+  // ── Sort: relevance when searching, newest otherwise ──
+  const sort = filter.q?.trim()
+    ? { score: { $meta: "textScore" }, createdAt: -1 }
+    : { createdAt: -1 };
+
   const [ads, total] = await Promise.all([
-    Ad.find(query)
+    Ad.find(query, filter.q?.trim() ? { score: { $meta: "textScore" } } : {})
       .populate("category", "name icon")
       .populate("subcategory", "name")
       .populate("user", "fullName phone")
-      .sort({ createdAt: -1 })
+      .sort(sort)
       .skip(skip)
       .limit(limit)
       .lean(),
@@ -127,6 +141,28 @@ const getAdById = async (id) => {
   await ad.save();
 
   return ad;
+};
+
+const updateAd = async (id, data, userId) => {
+  const ad = await Ad.findById(id);
+  if (!ad) throw new ErrorResponse(`Ad not found with id: ${id}`, 404);
+
+  if (ad.user.toString() !== userId) {
+    throw new ErrorResponse("You are not authorized to update this ad", 403);
+  }
+
+  if (data.fields) {
+    const subcategoryId = data.subcategory || ad.subcategory;
+    await validateFields(subcategoryId, data.fields);
+  }
+
+  return await Ad.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+  })
+    .populate("category", "name icon")
+    .populate("subcategory", "name")
+    .lean();
 };
 
 const getAdsByUser = async (userId, filter = {}) => {
@@ -167,28 +203,6 @@ const createAd = async (data, userId) => {
   await validateFields(data.subcategory, data.fields);
 
   return await Ad.create({ ...data, user: userId, status: "pending" });
-};
-
-const updateAd = async (id, data, userId) => {
-  const ad = await Ad.findById(id);
-  if (!ad) throw new ErrorResponse(`Ad not found with id: ${id}`, 404);
-
-  if (ad.user.toString() !== userId) {
-    throw new ErrorResponse("You are not authorized to update this ad", 403);
-  }
-
-  if (data.fields) {
-    const subcategoryId = data.subcategory || ad.subcategory;
-    await validateFields(subcategoryId, data.fields);
-  }
-
-  return await Ad.findByIdAndUpdate(id, data, {
-    new: true,
-    runValidators: true,
-  })
-    .populate("category", "name icon")
-    .populate("subcategory", "name")
-    .lean();
 };
 
 const deleteAd = async (id, { userId, isAdmin = false }) => {

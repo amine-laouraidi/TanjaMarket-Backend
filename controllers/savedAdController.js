@@ -22,4 +22,8 @@ const getSavedAdsCount = asyncHandler(async (req, res) => {
   const count = await savedAdService.getSavedAdsCount(req.user.id);
   res.status(200).json({ count });
 });
-module.exports = { toggleSave, getSavedAds ,checkSaved,getSavedAdsCount };
+const getSavedAdIds = asyncHandler(async (req, res) => {
+  const ids = await savedAdService.getSavedAdIds(req.user.id);
+  res.status(200).json({ ids });
+})
+module.exports = { toggleSave, getSavedAds ,checkSaved,getSavedAdsCount ,getSavedAdIds};

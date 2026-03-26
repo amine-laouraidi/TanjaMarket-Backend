@@ -4,6 +4,7 @@ const ErrorResponse = require("../utils/ErrorResponse");
 
 const getAllUsers = async (filter = {}) => {
   const query = {};
+  query.role = { $ne: "admin" };
 
   if (filter.status) query.status = filter.status;
   if (filter.search) {
@@ -14,13 +15,12 @@ const getAllUsers = async (filter = {}) => {
     ];
   }
 
-  const page  = Number(filter.page)  || 1;
+  const page = Number(filter.page) || 1;
   const limit = Number(filter.limit) || 20;
-  const skip  = (page - 1) * limit;
+  const skip = (page - 1) * limit;
 
   const [users, total] = await Promise.all([
-    User.find(query)
-      .select("-password")
+    User.find(query,"-password -role -avatar")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -28,18 +28,35 @@ const getAllUsers = async (filter = {}) => {
     User.countDocuments(query),
   ]);
 
+  // Fetch ad counts for all users in one query
+  const userIds = users.map((u) => u._id);
+  const adCounts = await Ad.aggregate([
+    { $match: { user: { $in: userIds } } },
+    { $group: { _id: "$user", count: { $sum: 1 } } },
+  ]);
+
+  // Map counts back to each user
+  const adCountMap = Object.fromEntries(
+    adCounts.map(({ _id, count }) => [_id.toString(), count]),
+  );
+
+  const usersWithAdCount = users.map((u) => ({
+    ...u,
+    adsCount: adCountMap[u._id.toString()] ?? 0,
+  }));
+
   return {
-    data: users,
+    data: usersWithAdCount,
     pagination: { total, page, limit, pages: Math.ceil(total / limit) },
   };
 };
 
 const getUserById = async (id) => {
-  const user = await User.findById(id).select("-password").lean();
+  const user = await User.findById(id).select("-password -role -avatar").lean();
   if (!user) throw new ErrorResponse(`User not found with id: ${id}`, 404);
 
   const ads = await Ad.find({ user: id })
-    .populate("category", "name icon")
+    .populate("category", "name")
     .populate("subcategory", "name")
     .sort({ createdAt: -1 })
     .lean();
