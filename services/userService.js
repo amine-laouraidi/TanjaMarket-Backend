@@ -84,6 +84,13 @@ const login = async ({ email, password }, device) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) throw new ErrorResponse("Invalid email or password", 401);
 
+  if (user.status === "banned") {
+    throw new ErrorResponse("Your account has been banned", 403);
+  }
+  if (user.status === "suspended") {
+    throw new ErrorResponse("Your account has been suspended", 403);
+  }
+
   const accessToken = generateAccessToken(user._id, user.role);
   const refreshToken = generateRefreshToken();
 

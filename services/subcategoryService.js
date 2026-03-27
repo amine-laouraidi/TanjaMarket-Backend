@@ -1,5 +1,6 @@
 const Subcategory = require("../models/Subcategory");
 const Category = require("../models/Category");
+const Ad = require("../models/Ad");
 const ErrorResponse = require("../utils/ErrorResponse");
 
 const getAllSubcategories = async (filter = {}) => {

@@ -1,4 +1,6 @@
 const Ad = require("../models/Ad");
+const Subcategory = require("../models/Subcategory");
+const FieldTemplate = require("../models/FieldTemplate");
 const Category = require("../models/Category");
 const ErrorResponse = require("../utils/ErrorResponse");
 
@@ -53,10 +55,32 @@ const deleteCategory = async (id) => {
   await category.deleteOne();
 };
 
+const getCategoryFull = async (id) => {
+  const category = await Category.findById(id).lean();
+  if (!category) throw new ErrorResponse("Category not found", 404);
+
+  const subcategories = await Subcategory.find({ category: id }).lean();
+
+  const fields = await FieldTemplate.find({
+    subcategory: { $in: subcategories.map((s) => s._id) },
+  }).lean();
+
+  // attach fields to their subcategory
+  const subcategoriesWithFields = subcategories.map((sub) => ({
+    ...sub,
+    fields: fields.filter(
+      (f) => f.subcategory.toString() === sub._id.toString(),
+    ),
+  }));
+
+  return { category, subcategories: subcategoriesWithFields };
+};
+
 module.exports = {
   getAllCategories,
   getCategoryById,
   createCategory,
   updateCategory,
   deleteCategory,
+  getCategoryFull,
 };

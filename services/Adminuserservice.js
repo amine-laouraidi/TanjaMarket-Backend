@@ -79,6 +79,10 @@ const banUser = async (id, status) => {
 
   user.status = status;
   await user.save();
+
+  const adStatus = status === "active" ? "published" : "rejected";
+  await Ad.updateMany({ user: id }, { status: adStatus });
+
   return user;
 };
 

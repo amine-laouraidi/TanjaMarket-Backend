@@ -31,10 +31,16 @@ const deleteCategory = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Category deleted" });
 });
 
+const getCategoryFull = asyncHandler(async(req,res) => {
+  const data = await categoryService.getCategoryFull(req.params.id);
+  res.status(200).json(data);
+})
+
 module.exports = {
   getCategories,
   getCategory,
   createCategory,
   updateCategory,
   deleteCategory,
+  getCategoryFull,
 };

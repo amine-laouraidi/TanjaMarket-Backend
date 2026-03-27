@@ -1,4 +1,3 @@
-// TODO
 const asyncHandler = require("express-async-handler");
 const adminUserService = require("../../services/adminUserService");
 
