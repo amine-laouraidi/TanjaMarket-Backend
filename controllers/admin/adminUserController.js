@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const adminUserService = require("../../services/adminUserService");
+const adminUserService = require("../../services/Adminuserservice");
 
 // GET /api/admin/users
 // GET /api/admin/users?status=banned&search=john&page=1
