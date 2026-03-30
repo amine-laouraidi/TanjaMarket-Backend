@@ -1,69 +1,69 @@
-AdZone - Full Stack Ads Management Platform
-AdZone is a full-featured web application designed to manage and browse classified ads efficiently. It provides users with the ability to post, search, and filter ads, while also offering powerful admin and category management features.
+# TanjaMarket — Backend
 
-Key Features
-Authentication & User Management
+REST API for TanjaMarket, a classified ads platform for Tanger, Morocco.
 
-User registration and login
+🔗 **Frontend:** [tanja-market-frontend.vercel.app](https://tanja-market-frontend.vercel.app)  
+🔗 **Frontend Repo:** [tanjaMarket-frontend](https://github.com/amine-laouraidi/tanjaMarket-frontend)
 
-Password reset functionality
+---
 
-Update user profile
+## Tech
 
-Get user ads by ID
+- **Node.js / Express.js**
+- **MongoDB / Mongoose**
+- **JWT** with refresh tokens
+- **Zod** for request validation
+- **Cloudinary** for image storage (URLs sent from frontend)
 
-Ads Management
+## Security
 
-Create, read, update, and delete ads
+- `helmet` — HTTP headers protection
+- `express-mongo-sanitize` — NoSQL injection prevention
+- `xss-clean` — XSS attack prevention
+- `cors` — restricted to frontend origin
+- `express-rate-limit` — rate limiting on all routes
+- `cookie-parser` — secure cookie handling
 
-Upload ad images
+---
 
-View ads by ID
+## Run locally
 
-Get all ads or ads by a specific user
+```bash
+git clone https://github.com/amine-laouraidi/TanjaMarket-Backend.git
+cd TanjaMarket-Backend
+npm install
+npm run server
+```
 
-Track ad views
+Create a `.env` file:
 
-Category System
+```env
+NODE_ENV=development
+PORT=5000
+MONGO_URI=your_mongodb_uri
+JWT_SECRET=your_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+CLIENT_URL=http://localhost:3000
+```
 
-Organize ads into 6 distinct categories
+---
 
-Fetch ads by category
+## API Overview
 
-Search & Filtering
+**Auth** — register, login, logout, refresh token, update profile
 
-Global ad search
+**Ads** — create, read, update, delete, get by user
 
-Filter ads by price, location, and date
+**Categories / Subcategories** — browse ads by category
 
-Display popular ads based on views or interactions
+**Fields** — dynamic field templates per category
 
-Backend Structure
-The backend includes 4 main controllers:
+**Saved Ads** — save and unsave ads
 
-Ads Controller
+**Admin** — manage users and ads
 
-createAds, getAllAds, getAdsByID, updateAds, deleteAds
+---
 
-uploadPhotosAds, getAdsByUser, getUsersByID
+## Notes
 
-Auth Controller
-
-register, login, resetPassword, updateUserDetails
-
-Category Controller
-
-getAdsByKategory (handles 6 ad categories)
-
-Search Controller
-
-searchAds, filterAds, getPopularAds
-
-Tech Stack
-Frontend: React.js, Redux Toolkit, TailwindCSS
-
-Backend: Node.js, Express.js, MongoDB
-
-Authentication: JWT (JSON Web Tokens)
-
-Image Upload: Multer
+This is a portfolio project — still a work in progress. Feedback is welcome.
