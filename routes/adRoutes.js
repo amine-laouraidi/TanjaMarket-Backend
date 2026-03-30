@@ -7,7 +7,7 @@ const {
   updateAd,
   deleteAd,
   changeAdStatus,
-} = require("../controllers/adcontroller");
+} = require("../controllers/adController");
 const { protect } = require("../middlewares/authMiddleware");
 const validate = require("../middlewares/validate");
 const { createAdSchema } = require("../validations/createAdSchema");
