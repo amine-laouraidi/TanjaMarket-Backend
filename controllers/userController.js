@@ -8,7 +8,7 @@ const register = asyncHandler(async (req, res) => {
   const device = req.headers["user-agent"];
   const {  accessToken, refreshToken } = await userService.register(req.body, device);
 
-  res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
+  res.cookie("refreshToken", refreshToken);
   res.status(201).json({  accessToken ,refreshToken});
 });
 
