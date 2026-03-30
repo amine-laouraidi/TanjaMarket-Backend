@@ -42,7 +42,6 @@ NODE_ENV=development
 PORT=5000
 MONGO_URI=your_mongodb_uri
 JWT_SECRET=your_secret
-JWT_REFRESH_SECRET=your_refresh_secret
 CLIENT_URL=http://localhost:3000
 ```
 
@@ -60,7 +59,7 @@ CLIENT_URL=http://localhost:3000
 
 **Saved Ads** — save and unsave ads
 
-**Admin** — manage users and ads
+**Admin** — dashboard stats, manage users (ban/delete), manage ads (approve/reject/delete), manage categories, subcategories and custom field templates per subcategory
 
 ---
 
