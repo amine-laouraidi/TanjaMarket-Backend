@@ -85,7 +85,7 @@ const adSchema = new mongoose.Schema(
         values: ["pending", "published", "rejected", "sold", "expired"],
         message: '"{VALUE}" n\'est pas un statut valide',
       },
-      default: "pending",
+      default: "published",
     },
 
     views: {

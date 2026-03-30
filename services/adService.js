@@ -202,7 +202,7 @@ const createAd = async (data, userId) => {
 
   await validateFields(data.subcategory, data.fields);
 
-  return await Ad.create({ ...data, user: userId, status: "pending" });
+  return await Ad.create({ ...data, user: userId});
 };
 
 const deleteAd = async (id, { userId, isAdmin = false }) => {
@@ -263,7 +263,7 @@ const getAllAdsAdmin = async (filter = {}) => {
 
   const [ads, total] = await Promise.all([
     Ad.find(query)
-      .populate("category", "name icon")
+      .populate("category", "name")
       .populate("subcategory", "name")
       .populate("user", "fullName phone email")
       .sort({ createdAt: -1 })

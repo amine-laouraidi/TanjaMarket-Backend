@@ -4,13 +4,13 @@ const adService = require("../../services/adService");
 // GET /api/admin/ads
 // GET /api/admin/ads?status=draft&category=id
 const getAllAds = asyncHandler(async (req, res) => {
-  const ads = await adminAdService.getAllAdsAdmin(req.query);
+  const ads = await adService.getAllAdsAdmin(req.query);
   res.status(200).json(ads);
 });
 
 // PUT /api/admin/ads/:id/status
 const changeAdStatus = asyncHandler(async (req, res) => {
-  const ad = await adService.changeAdStatus(req.params.id, req.body.status,{isAdmin:true});
+  const ad = await adService.updateAdStatus(req.params.id, req.body.status,{isAdmin:true});
   res.status(200).json({ message: "Ad status updated", data: ad });
 });
 
